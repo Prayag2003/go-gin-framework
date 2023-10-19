@@ -51,6 +51,23 @@ func createCourse(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, newCourse)
 }
 
+func getAllCoursesByAuthor(c *gin.Context) {
+	var f bool
+	f = false
+
+	author := c.Param("author")
+
+	for _, course := range courses {
+		if course.Author == author {
+			c.IndentedJSON(http.StatusOK, course)
+			f = true
+		}
+	}
+	if !f {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"errMessage": "No courses for this author is found."})
+	}
+}
+
 func main() {
 
 	// Logging to a file.
@@ -68,14 +85,15 @@ func main() {
 	courses = append(courses, Course{"Amazon Web Services", "Hitesh Chaudhary"})
 
 	// API Endpoints
-	r.GET("/ping", func(c *gin.Context) {
+	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Hello World",
+			"message": "You are at your home, i.e, http://127.0.0.1 Hello World",
 		})
 	})
 
 	r.GET("/getcoursebyquery", getCourse)
 	r.GET("/courses", getAllCourses)
 	r.POST("/createcourse", createCourse)
-	r.Run() // listen and serve on localhost:8080
+	r.GET("/getbyauth/{author}", getAllCoursesByAuthor)
+	r.Run(":8000")
 }
